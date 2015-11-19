@@ -19,27 +19,20 @@
 # ide menu
 # search menu
 
+
+
 def command_line_menu
   selection = 0
   while selection != 5
     puts '****** Command Lines Cheats ******'
-    puts '1. Copy - cp - cp path/to/file path/to/destination'
-    puts '2. Move - mv - mv path/to/file path/to/destination'
-    puts '3. Make directory - mkdir - mkdir path/name/of/directory'
-    puts '4. Search More Commands'
-    puts '5. Main Menu'
+    @menus[:command_line].each {|num, value| puts "#{num} #{value[:text]}"}
     puts "Make a selection:"
-    selection = gets.to_i
+    selection = gets.strip
     case selection
-    when 1 
-      puts `man cp`
-    when 2
-      puts `man mv`
-    when 3
-      puts `man mkdir`
-    when 4
-      search_menu
-    when 5
+    when '1', '2', '3'
+      @menus[:command_line][selection][:method].call(@menus[:command_line][selection][:cmd])
+    when '4', '5'
+      @menus[:command_line][selection][:method].call
     else 
       puts 'That is not an option. Try again.'
     end
@@ -49,63 +42,79 @@ end
 def sublime_menu # google ide shortcuts
   selection = 'no'
   while selection == 'no'
-    puts """ ****** Sublime Shortcuts ******
-      1. ⌘ + X = cut line
-      2. ⌘ + L = select line
-      3. ⌘ + D = select word
-      4. ⌘ + ] = indent current line(s)
-      5. ⌘ + [ = un-indent current line(s)
-      6. ⌘ + / = comment/uncomment current line(s)
-      7. ⌘ + F = find
-      """
+    puts " ****** Sublime Shortcuts ****** "
+    @menus[:sublime].each { |num, value| puts "#{num} #{value[:text]}" }
     puts 'Return to main menu?'
     selection = gets.strip.downcase
   end
 end
 
-def search_menu
+def search_menu(search, main)
   puts '****** Search ******'
   puts 'Enter a command:'
   cmd = gets.strip
-  puts `man #{cmd}`
+  search.call(cmd)
   puts 'Search again?'
   if gets.strip.downcase == 'yes'
-    search_menu
+    search_menu(search, main)
+  else
+    main
   end
 end
 
+cmd_line = -> { command_line_menu }
+quit = -> { exit(0) }
+main = -> { main_menu }
+sbl = -> { sublime_menu }
+search = -> (cmd) { puts `man #{cmd}`}
+srch = -> { search_menu(search, main) }
+
+
+menus = {
+  main: {
+    '1'=> {text: 'Command Line', method: cmd_line },
+    '2'=> {text: 'Sublime', method: sbl },
+    '3'=> {text: 'Search', method: srch },
+    '4'=> {text: 'Quit', method: quit }
+  },
+
+  command_line: {
+    '1'=> {text: 'Copy - cp - cp path/to/file path/to/destination', method: search, cmd: 'cp' },
+    '2'=> {text: 'Move - mv - mv path/to/file path/to/destination', method: search, cmd: 'mv' },
+    '3'=> {text: 'Make directory - mkdir - mkdir path/name/of/directory', method: search, cmd: 'mkdir' },
+    '4'=> {text: 'Search More Commands', method: srch},
+    '5'=> {text: 'Main Menu', method: main}
+  },
+
+  sublime: {
+    '1': {text: '⌘ + X = cut line'},
+    '2': {text: '⌘ + L = select line'},
+    '3': {text: '⌘ + D = select word'},
+    '4': {text: '⌘ + ] = indent current line(s)'},
+    '5': {text: '⌘ + [ = un-indent current line(s)'},
+    '6': {text: '⌘ + / = comment/uncomment current line(s)'},
+    '7': {text: '⌘ + F = find'},
+    '8': {text: 'Main Menu'}
+  }
+}
+@menus = menus
 
 def main_menu
   selection = 0
   while selection != 4
     puts '****** My Cheatsheet ******'
-    puts '1. Command Line'
-    puts '2. Sublime'
-    puts '3. Search'
-    puts '4. Quit'
+    @menus[:main].each { |num, value| puts "#{num}: #{value[:text]}" } 
     puts 'Make a selection:'
-    selection = gets.to_i
+    selection = gets.strip
     case selection
-    when 1 
-      command_line_menu
-    when 2
-      sublime_menu
-    when 3
-      search_menu
-    when 4
-      puts 'Goodbye'
-      exit 0
+    when '1', '2', '3', '4' 
+      @menus[:main][selection][:method].call
     else
       puts 'That is not an option. Try again.'
     end
   end
 end
 
+
 main_menu
-
-
-
-
-
-
 
