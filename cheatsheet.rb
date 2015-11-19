@@ -13,13 +13,41 @@
 # BONUS:
 #   Allow the user to search.  When a command is entered into the search show the man pages for that command.
 
-# main menu
-# have a case statement for main menu options
-# command line menu
-# ide menu
-# search menu
+cmd_line = -> { command_line_menu }
+quit = -> { exit(0) }
+main = -> { main_menu }
+sbl = -> { sublime_menu }
+search = -> (cmd) { puts `man #{cmd}`}
+srch = -> { search_menu(search, main) }
 
+menus = {
+  main: {
+    '1'=> {text: 'Command Line', method: cmd_line },
+    '2'=> {text: 'Sublime', method: sbl },
+    '3'=> {text: 'Search', method: srch },
+    '4'=> {text: 'Quit', method: quit }
+  },
 
+  command_line: {
+    '1'=> {text: 'Copy - cp - cp path/to/file path/to/destination', method: search, cmd: 'cp' },
+    '2'=> {text: 'Move - mv - mv path/to/file path/to/destination', method: search, cmd: 'mv' },
+    '3'=> {text: 'Make directory - mkdir - mkdir path/name/of/directory', method: search, cmd: 'mkdir' },
+    '4'=> {text: 'Search More Commands', method: srch},
+    '5'=> {text: 'Main Menu', method: main}
+  },
+
+  sublime: {
+    '1': {text: '⌘ + X = cut line'},
+    '2': {text: '⌘ + L = select line'},
+    '3': {text: '⌘ + D = select word'},
+    '4': {text: '⌘ + ] = indent current line(s)'},
+    '5': {text: '⌘ + [ = un-indent current line(s)'},
+    '6': {text: '⌘ + / = comment/uncomment current line(s)'},
+    '7': {text: '⌘ + F = find'},
+    '8': {text: 'Main Menu'}
+  }
+}
+@menus = menus
 
 def command_line_menu
   selection = 0
@@ -62,43 +90,6 @@ def search_menu(search, main)
   end
 end
 
-cmd_line = -> { command_line_menu }
-quit = -> { exit(0) }
-main = -> { main_menu }
-sbl = -> { sublime_menu }
-search = -> (cmd) { puts `man #{cmd}`}
-srch = -> { search_menu(search, main) }
-
-
-menus = {
-  main: {
-    '1'=> {text: 'Command Line', method: cmd_line },
-    '2'=> {text: 'Sublime', method: sbl },
-    '3'=> {text: 'Search', method: srch },
-    '4'=> {text: 'Quit', method: quit }
-  },
-
-  command_line: {
-    '1'=> {text: 'Copy - cp - cp path/to/file path/to/destination', method: search, cmd: 'cp' },
-    '2'=> {text: 'Move - mv - mv path/to/file path/to/destination', method: search, cmd: 'mv' },
-    '3'=> {text: 'Make directory - mkdir - mkdir path/name/of/directory', method: search, cmd: 'mkdir' },
-    '4'=> {text: 'Search More Commands', method: srch},
-    '5'=> {text: 'Main Menu', method: main}
-  },
-
-  sublime: {
-    '1': {text: '⌘ + X = cut line'},
-    '2': {text: '⌘ + L = select line'},
-    '3': {text: '⌘ + D = select word'},
-    '4': {text: '⌘ + ] = indent current line(s)'},
-    '5': {text: '⌘ + [ = un-indent current line(s)'},
-    '6': {text: '⌘ + / = comment/uncomment current line(s)'},
-    '7': {text: '⌘ + F = find'},
-    '8': {text: 'Main Menu'}
-  }
-}
-@menus = menus
-
 def main_menu
   selection = 0
   while selection != 4
@@ -114,7 +105,6 @@ def main_menu
     end
   end
 end
-
 
 main_menu
 
