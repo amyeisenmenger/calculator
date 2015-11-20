@@ -20,23 +20,40 @@
 # to
 # 6. Store a history of the users equations and answers
 # a. hint: use hashes ­ you don’t really know this yet
+# make sure input isn't gibberish???
 
-
-
-# def calculate(left, operator, right)
-# end
-
-# puts 'input first #'
-# num1 = gets.to_i
-
-# puts 'input operator'
-# operator = gets.strip
-
-# puts 'input second #'
+# hint 1
+# num = gets.to_i
+# operator = gets.to_sym
 # num2 = gets.to_i
+# hint 2
 
-# make sure input isn't gibberish????
-#   
+# str.gsub(" ","").split(/(\+|\-|\/|\*)/)
+# string is any string "1+2 * 3"
+# gsub takes 2 params 1st is param to find 2nd is what to replace it with
+# gsub(" ", "") replaces all blank spaces 
+# inside the split I used regex which is a way to search a string for a sub string
+# so I am splitting on any + - / *
+    
+#   "1 + 2*3 -44" becomes ["1", "+", "2", "3", "-", "44]
+# num.send(operator, num2)
+
+
+add = -> (number_1, number_2) {number_1 + number_2}
+sub = -> (number_1, number_2) {number_1 - number_2}
+mul = -> (number_1, number_2) {number_1 * number_2}
+@check_if_0 = -> (number_2) {'Error:cannot divide by 0' if number_2==0}
+div = -> (number_1, number_2) {number_1.to_f/number_2 if @check_if_0.call(number_2)==nil}
+
+@operations ={
+   '+'=> add,
+   '-'=> sub, 
+   '*'=> mul,
+   "/"=> div
+}
+
+@history = {}
+
 def repeat_calculation
   question = 'yes'
   while question == 'yes'
@@ -45,60 +62,42 @@ def repeat_calculation
     if question == 'yes'
       ask_equation
     elsif question == 'no'
+      puts 'Your calculation history is:'
+      @history.each {|expression, answer| puts expression + " = #{answer}"}
       exit
     else
-      puts 'Error'
+      puts 'Error: incorrect format'
       repeat_calculation
     end
   end
 end
 
 def clear(answer)
-  answer = answer
   puts 'Clear?'
   choice = gets.strip.downcase
   if choice == 'no'
     puts answer
-    use_result(answer)
+    ask_equation(answer.to_i)
   else
     nil
   end
 end
 
-def add(number_1, number_2)
-  number_1 + number_2
-end
-
-def subtract(number_1, number_2)
-  number_1 - number_2
-end
-
-def multiply(number_1, number_2)
-  number_1. * number_2
-end
-
-def divide(number_1, number_2)
-  if number_2 == 0
-    puts 'Error: cannot divide by 0'
-  else
-    number_1.to_f / number_2
-  end
-end
-
-def calculate(num1, operator, num2)
+def calculate(number_1, operator, number_2)
   case operator
-  when '+'
-    answer = add(num1, num2)
-  when '-'
-    answer = subtract(num1, num2)
-  when '*'
-    answer = multiply(num1, num2)
+  when '+', '-', '*'
+    answer = @operations[operator].call(number_1, number_2)   
   when '/'
-    answer = divide(num1, num2)
+    if number_2 == 0
+      puts 'Error: cannot divide by 0'
+    else
+      answer = @operations[operator].call(number_1, number_2)
+    end
   else
-     puts 'Error'
+     puts 'Error: incorrect format or operator'
   end
   puts "#{answer}"
+  @history["#{number_1} #{operator} #{number_2}"] = answer
   answer
 end
 
@@ -124,10 +123,9 @@ def ask_equation(*num1)
   repeat_calculation
 end
 
-
-def use_result(answer)
-  answer = answer.to_i
-  ask_equation(answer)
-end
-
 ask_equation()
+
+
+
+
+
